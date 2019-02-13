@@ -16,18 +16,33 @@ const config = {
 
 
 
-/* GET users listing. */
-router.get('/actions', function (req, res, next) {
+/* GET Actions list. */
+router.get('/actions', function (req, res) {
     new sql.ConnectionPool(config).connect()
-    .then(pool => {
-        return pool.query(`SELECT ActionCode, ActionName, FarsiDescription FROM Actions WHERE (IsUsedForFCF = 0) AND (IsNeedToResponse = 1)`)
-    })
-    .then(result => {
-        res.send(result);
-    })
-    .catch(err => {
-        res.send(err);
-    });
+        .then(pool => {
+            return pool.query(`SELECT ActionCode, ActionName, FarsiDescription FROM Actions WHERE (IsUsedForFCF = 0) AND (IsNeedToResponse = 1)`)
+        })
+        .then(result => {
+            res.send(result);
+        })
+        .catch(err => {
+            res.send(err);
+        });
+});
+
+// Get Actions list by code
+router.get('/actions/:actionCode', function (req, res) {
+    new sql.ConnectionPool(config).connect()
+        .then(pool => {
+            const actionCode = req.params.actionCode;
+            return pool.query(`SELECT ActionCode, ActionName, FarsiDescription FROM Actions WHERE (IsUsedForFCF = 0 AND IsNeedToResponse = 1 AND ActionCode = ${actionCode})`)
+        })
+        .then(result => {
+            res.send(result);
+        })
+        .catch(err => {
+            res.send(err);
+        });
 });
 
 module.exports = router;
